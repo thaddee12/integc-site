@@ -1,5 +1,5 @@
 /* ==========================================================================
-   INTEGC — comportements partagés (menu, nav tubelight, reveal, compteurs,
+   INTEGC · comportements partagés (menu, nav tubelight, reveal, compteurs,
    hero laser, scroll-expand projets phares)
    ========================================================================== */
 (function () {

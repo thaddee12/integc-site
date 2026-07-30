@@ -1,5 +1,5 @@
 /* ==========================================================================
-   INTEGC — feuille de style partagée
+   INTEGC · feuille de style partagée
    Charte : jaune #FFF000 (accent) · bleu marine #283193 (dominante)
    bleu ciel #3572B7 (accent secondaire) · Sora (titres) + Manrope (texte)
    ========================================================================== */
@@ -377,7 +377,7 @@ footer.site-footer { background: var(--ink-2); color: #c7cbe4; margin-top: auto;
 .wa-float:hover { transform: scale(1.06); }
 
 /* ==========================================================================
-   PAGE HEADER (bandeau sombre générique — sous-pages)
+   PAGE HEADER (bandeau sombre générique, sous-pages)
    ========================================================================== */
 .page-hero { background: var(--ink-2); color: #fff; position: relative; overflow: hidden; }
 .page-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.30; }
@@ -404,7 +404,7 @@ footer.site-footer { background: var(--ink-2); color: #c7cbe4; margin-top: auto;
 .form-success h3 { color: #1f7a3d; font-size: 20px; margin-bottom: 10px; }
 
 /* ==========================================================================
-   À PROPOS — genèse, chiffres
+   À PROPOS · genèse, chiffres
    ========================================================================== */
 .genesis-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: center; }
 .genesis-grid p { font-size: 16px; color: #454a63; line-height: 1.75; margin: 0 0 18px; }
@@ -530,7 +530,7 @@ footer.site-footer { background: var(--ink-2); color: #c7cbe4; margin-top: auto;
 @media (max-width: 900px) { .act-other-grid { grid-template-columns: repeat(2, 1fr); } }
 
 /* ==========================================================================
-   RÉFÉRENCES — carrousel + filtres + grille
+   RÉFÉRENCES · carrousel + filtres + grille
    ========================================================================== */
 .ref-carousel { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 21/9; background: var(--ink-2); box-shadow: 0 30px 70px -34px rgba(13,17,48,0.5); }
 .ref-carousel-track { display: flex; height: 100%; transition: transform .6s cubic-bezier(.4,0,.2,1); }
@@ -576,7 +576,7 @@ footer.site-footer { background: var(--ink-2); color: #c7cbe4; margin-top: auto;
 @media (max-width: 600px) { .ref-grid { grid-template-columns: 1fr; } .ref-filter-bar { position: static; } }
 
 /* ==========================================================================
-   ACTUALITÉS — à la une + détail
+   ACTUALITÉS · à la une + détail
    ========================================================================== */
 .news-featured { display: grid; grid-template-columns: 1.15fr 1fr; border-radius: 18px; overflow: hidden; background: var(--ink-2); box-shadow: 0 24px 60px -28px rgba(13,17,48,0.55); }
 .news-featured-img { position: relative; min-height: 340px; background: var(--ink-2); }
