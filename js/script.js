@@ -382,7 +382,10 @@
       sorted.forEach(function (c) { grid.appendChild(c); });
       if (countEl) countEl.textContent = visible.length;
       if (missionLabelEl) {
-        var missionLabels = { all: 'Toutes les missions', etude: 'Études', controle: 'Contrôle & suivi', moe: "Maîtrise d'œuvre" };
+        var isEn = document.documentElement.lang === 'en';
+        var missionLabels = isEn
+          ? { all: 'All missions', etude: 'Design & Studies', controle: 'Supervision & Control', moe: 'Project Management' }
+          : { all: 'Toutes les missions', etude: 'Études', controle: 'Contrôle & suivi', moe: "Maîtrise d'œuvre" };
         missionLabelEl.textContent = missionLabels[mission] || missionLabels.all;
       }
     }

@@ -109,6 +109,8 @@ header.site-header {
 .tl-item:hover { color: var(--navy); }
 .tl-item[data-active="true"] { color: var(--navy); }
 .nav-dd { position: relative; }
+.nav-dd > a:first-child { color: inherit; transition: color .25s ease; }
+.nav-dd:hover > a:first-child, .nav-dd[data-active="true"] > a:first-child { color: var(--navy); }
 .nav-dd-panel {
   position: absolute; top: calc(100% + 12px); left: 50%; transform: translateX(-50%) translateY(8px);
   width: 340px; padding: 10px; border-radius: 14px;
