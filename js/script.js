@@ -307,4 +307,176 @@
       setTimeout(function () { span.remove(); }, 650);
     });
   });
+
+  /* ---------- carrousel références (projets phares) ---------- */
+  var carousel = document.querySelector('.ref-carousel');
+  if (carousel) {
+    var track = carousel.querySelector('.ref-carousel-track');
+    var slides = Array.prototype.slice.call(carousel.querySelectorAll('.ref-carousel-slide'));
+    var dots = Array.prototype.slice.call(document.querySelectorAll('.ref-carousel-dot'));
+    var idx = 0;
+    var timer = null;
+    function renderCarousel() {
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+    }
+    function goTo(i) { idx = (i + slides.length) % slides.length; renderCarousel(); }
+    function next() { goTo(idx + 1); }
+    function prev() { goTo(idx - 1); }
+    function restartTimer() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(next, 5000);
+    }
+    var nextBtn = document.querySelector('[data-carousel-next]');
+    var prevBtn = document.querySelector('[data-carousel-prev]');
+    if (nextBtn) nextBtn.addEventListener('click', function () { next(); restartTimer(); });
+    if (prevBtn) prevBtn.addEventListener('click', function () { prev(); restartTimer(); });
+    dots.forEach(function (d, i) {
+      d.addEventListener('click', function () { goTo(i); restartTimer(); });
+    });
+    renderCarousel();
+    restartTimer();
+  }
+
+  /* ---------- filtres références (client-side) ---------- */
+  var filterBar = document.querySelector('.ref-filter-bar');
+  if (filterBar) {
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.ref-card'));
+    var qInput = document.getElementById('f-query');
+    var selMission = document.getElementById('f-mission');
+    var selDomain = document.getElementById('f-domain');
+    var selClient = document.getElementById('f-client');
+    var selRegion = document.getElementById('f-region');
+    var selYear = document.getElementById('f-year');
+    var selSort = document.getElementById('f-sort');
+    var resetBtn = document.getElementById('f-reset');
+    var countEl = document.getElementById('ref-count-num');
+    var missionLabelEl = document.getElementById('ref-count-mission');
+    var grid = document.querySelector('.ref-grid');
+
+    function applyFilters() {
+      var q = (qInput.value || '').toLowerCase().trim();
+      var mission = selMission.value, domain = selDomain.value, client = selClient.value, region = selRegion.value, year = selYear.value;
+      var visible = [];
+      cards.forEach(function (c) {
+        var ok = true;
+        if (mission !== 'all' && c.getAttribute('data-mission') !== mission) ok = false;
+        if (ok && domain !== 'all' && c.getAttribute('data-domain') !== domain) ok = false;
+        if (ok && client !== 'all' && c.getAttribute('data-client') !== client) ok = false;
+        if (ok && region !== 'all' && c.getAttribute('data-region') !== region) ok = false;
+        if (ok && year !== 'all' && c.getAttribute('data-year') !== year) ok = false;
+        if (ok && q) {
+          var name = (c.getAttribute('data-name') || '').toLowerCase();
+          var cli = (c.getAttribute('data-client') || '').toLowerCase();
+          if (name.indexOf(q) === -1 && cli.indexOf(q) === -1) ok = false;
+        }
+        c.hidden = !ok;
+        if (ok) visible.push(c);
+      });
+      var sort = selSort.value;
+      var sorted = visible.slice().sort(function (a, b) {
+        if (sort === 'year-desc') return b.getAttribute('data-year') - a.getAttribute('data-year');
+        if (sort === 'year-asc') return a.getAttribute('data-year') - b.getAttribute('data-year');
+        return (a.getAttribute('data-name') || '').localeCompare(b.getAttribute('data-name') || '');
+      });
+      sorted.forEach(function (c) { grid.appendChild(c); });
+      if (countEl) countEl.textContent = visible.length;
+      if (missionLabelEl) {
+        var missionLabels = { all: 'Toutes les missions', etude: 'Études', controle: 'Contrôle & suivi', moe: "Maîtrise d'œuvre" };
+        missionLabelEl.textContent = missionLabels[mission] || missionLabels.all;
+      }
+    }
+    [qInput, selMission, selDomain, selClient, selRegion, selYear, selSort].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener('input', applyFilters);
+      el.addEventListener('change', applyFilters);
+    });
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        qInput.value = '';
+        [selMission, selDomain, selClient, selRegion, selYear].forEach(function (s) { s.value = 'all'; });
+        selSort.value = 'year-desc';
+        applyFilters();
+      });
+    }
+    var params = new URLSearchParams(window.location.search);
+    var missionParam = params.get('mission');
+    if (missionParam && selMission) selMission.value = missionParam;
+    applyFilters();
+  }
+
+  /* ---------- formulaire contact ---------- */
+  var contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nom = document.getElementById('c-nom');
+      var email = document.getElementById('c-email');
+      var message = document.getElementById('c-message');
+      var ok = true;
+      [nom, email, message].forEach(function (f) { f.closest('.form-field').classList.remove('error'); });
+      if (!nom.value.trim()) { nom.closest('.form-field').classList.add('error'); ok = false; }
+      if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.closest('.form-field').classList.add('error'); ok = false; }
+      if (!message.value.trim() || message.value.trim().length < 10) { message.closest('.form-field').classList.add('error'); ok = false; }
+      if (!ok) return;
+      contactForm.hidden = true;
+      document.getElementById('contact-success').hidden = false;
+    });
+    var contactReset = document.getElementById('contact-reset');
+    if (contactReset) {
+      contactReset.addEventListener('click', function () {
+        contactForm.reset();
+        contactForm.hidden = false;
+        document.getElementById('contact-success').hidden = true;
+      });
+    }
+  }
+
+  /* ---------- formulaire vivier de talents (carrières) ---------- */
+  var talentForm = document.getElementById('talent-form');
+  if (talentForm) {
+    var talentCountEl = document.getElementById('talent-count');
+    function refreshTalentCount() {
+      var n = 0;
+      try { n = (JSON.parse(localStorage.getItem('integc_talents') || '[]')).length; } catch (e) {}
+      if (talentCountEl) talentCountEl.textContent = n;
+    }
+    refreshTalentCount();
+    talentForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nom = document.getElementById('t-nom');
+      var email = document.getElementById('t-email');
+      var tel = document.getElementById('t-tel');
+      var profil = document.getElementById('t-profil');
+      var ok = true;
+      [nom, email, tel, profil].forEach(function (f) { f.closest('.form-field').classList.remove('error'); });
+      if (!nom.value.trim()) { nom.closest('.form-field').classList.add('error'); ok = false; }
+      if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.closest('.form-field').classList.add('error'); ok = false; }
+      if (!tel.value.trim()) { tel.closest('.form-field').classList.add('error'); ok = false; }
+      if (!profil.value) { profil.closest('.form-field').classList.add('error'); ok = false; }
+      if (!ok) return;
+      try {
+        var db = JSON.parse(localStorage.getItem('integc_talents') || '[]');
+        db.push({
+          nom: nom.value, email: email.value, tel: tel.value, profil: profil.value,
+          exp: document.getElementById('t-exp') ? document.getElementById('t-exp').value : '',
+          niveau: document.getElementById('t-niveau') ? document.getElementById('t-niveau').value : '',
+          region: document.getElementById('t-region') ? document.getElementById('t-region').value : '',
+          date: new Date().toISOString()
+        });
+        localStorage.setItem('integc_talents', JSON.stringify(db));
+      } catch (err) {}
+      talentForm.hidden = true;
+      document.getElementById('talent-success').hidden = false;
+    });
+    var talentReset = document.getElementById('talent-reset');
+    if (talentReset) {
+      talentReset.addEventListener('click', function () {
+        talentForm.reset();
+        talentForm.hidden = false;
+        document.getElementById('talent-success').hidden = true;
+        refreshTalentCount();
+      });
+    }
+  }
 })();
