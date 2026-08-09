@@ -122,176 +122,90 @@
     render();
   }
 
-  /* ---------- hero laser (bâtiment tracé, canvas plein cadre) ---------- */
+  /* ---------- hero réseau de particules (canvas plein cadre, interactif souris) ---------- */
   var laserCanvas = document.getElementById('hero-laser');
   if (laserCanvas) {
-    var LASER_COLOR = '#FFF000';
-    var NODE_COLOR = '#8fb8ec';
-    var GRID_COLOR = '#3572B7';
-    var DRAW_SPEED = 1.9;
-    var HOLD_TIME = 1.1;
-    var FADE_TIME = 0.55;
-
-    var nodes = [
-      [0.18, 0.06], [0.50, 0.06], [0.82, 0.06],
-      [0.18, 0.34], [0.50, 0.34], [0.82, 0.34],
-      [0.18, 0.60], [0.50, 0.60], [0.82, 0.60],
-      [0.18, 0.82], [0.50, 0.82], [0.82, 0.82],
-      [0.50, 0.97]
-    ];
-    var beams = [
-      [0,1],[1,2],
-      [0,3],[1,4],[2,5],
-      [3,4],[4,5],
-      [3,6],[4,7],[5,8],
-      [6,7],[7,8],
-      [6,9],[7,10],[8,11],
-      [9,10],[10,11],
-      [9,12],[11,12]
-    ];
-
     var ctx = laserCanvas.getContext('2d');
-    var W = 0, H = 0, DPR = 1;
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function buildingBox() {
-      var portrait = W < H * 1.05;
-      var bw = Math.min(W * (portrait ? 0.72 : 0.42), 520);
-      var bh = Math.min(H * 0.70, bw * 1.32);
-      var cx = portrait ? W * 0.5 : W * 0.72;
-      var cy = H * 0.52;
-      return { x: cx - bw / 2, y: cy - bh / 2, w: bw, h: bh };
-    }
-    function P(i, box) { return { x: box.x + nodes[i][0] * box.w, y: box.y + (1 - nodes[i][1]) * box.h }; }
+    var SKY = '53,114,183', ACCENT = '255,240,0', NODE_SKY = '#8fb8ec';
+    var W = 0, H = 0, DPR = 1, parts = [];
+    var mouse = { x: null, y: null, r: 150 };
+    function rand(a, b) { return a + Math.random() * (b - a); }
 
-    var beamLen = [];
-    function computeLengths(box) {
-      if (!box || box.w < 2 || box.h < 2) return;
-      beamLen = beams.map(function (pair) {
-        var p = P(pair[0], box), q = P(pair[1], box);
-        return Math.hypot(q.x - p.x, q.y - p.y) / Math.min(box.w, box.h);
-      });
+    function init() {
+      parts = [];
+      var n = Math.min(120, Math.round((W * H) / 12000));
+      for (var i = 0; i < n; i++) {
+        var size = rand(1.1, 2.6);
+        parts.push({
+          x: rand(size * 2, W - size * 2), y: rand(size * 2, H - size * 2),
+          vx: rand(-0.22, 0.22), vy: rand(-0.22, 0.22),
+          size: size, accent: Math.random() < 0.14
+        });
+      }
     }
     function resize() {
       DPR = Math.min(window.devicePixelRatio || 1, 2);
       W = laserCanvas.clientWidth; H = laserCanvas.clientHeight;
-      laserCanvas.width = Math.round(W * DPR);
-      laserCanvas.height = Math.round(H * DPR);
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      computeLengths(buildingBox());
+      laserCanvas.width = Math.round(W * DPR); laserCanvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0); init();
     }
-    window.addEventListener('resize', resize);
+    function onMove(e) { var r = laserCanvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; }
+    function onLeave() { mouse.x = null; mouse.y = null; }
 
-    function drawGrid(box, alpha) {
-      ctx.save();
-      ctx.strokeStyle = GRID_COLOR;
-      ctx.globalAlpha = 0.10 * alpha;
-      ctx.lineWidth = 1;
-      var step = box.w / 8;
-      for (var gx = box.x - step; gx <= box.x + box.w + step; gx += step) {
-        ctx.beginPath(); ctx.moveTo(gx, box.y - step); ctx.lineTo(gx, box.y + box.h + step); ctx.stroke();
-      }
-      for (var gy = box.y - step; gy <= box.y + box.h + step; gy += step) {
-        ctx.beginPath(); ctx.moveTo(box.x - step, gy); ctx.lineTo(box.x + box.w + step, gy); ctx.stroke();
-      }
-      ctx.restore();
-    }
-    function drawBeam(p, q, t) {
-      var ex = p.x + (q.x - p.x) * t, ey = p.y + (q.y - p.y) * t;
-      ctx.save();
-      ctx.strokeStyle = LASER_COLOR; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
-      ctx.shadowColor = LASER_COLOR; ctx.shadowBlur = 10;
-      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(ex, ey); ctx.stroke();
-      ctx.restore();
-      return { ex: ex, ey: ey };
-    }
     function drawNode(p) {
-      ctx.save();
-      ctx.fillStyle = NODE_COLOR; ctx.shadowColor = NODE_COLOR; ctx.shadowBlur = 12;
-      ctx.beginPath(); ctx.arc(p.x, p.y, 3.1, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 7);
+      if (p.accent) { ctx.fillStyle = 'rgba(' + ACCENT + ',0.95)'; ctx.shadowColor = 'rgba(' + ACCENT + ',0.8)'; ctx.shadowBlur = 8; }
+      else { ctx.fillStyle = NODE_SKY; ctx.shadowColor = 'rgba(' + SKY + ',0.7)'; ctx.shadowBlur = 5; }
+      ctx.fill(); ctx.shadowBlur = 0;
     }
-    function drawHead(x, y) {
-      if (!isFinite(x) || !isFinite(y)) return;
-      ctx.save();
-      var g = ctx.createRadialGradient(x, y, 0, x, y, 16);
-      g.addColorStop(0, 'rgba(255,255,255,0.95)');
-      g.addColorStop(0.35, LASER_COLOR);
-      g.addColorStop(1, 'rgba(255,240,0,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x, y, 16, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    }
-    function drawScanLine(box, progress) {
-      var y = box.y + box.h - progress * box.h;
-      ctx.save();
-      var g = ctx.createLinearGradient(0, y - 40, 0, y + 6);
-      g.addColorStop(0, 'rgba(255,240,0,0)');
-      g.addColorStop(1, 'rgba(255,240,0,0.5)');
-      ctx.fillStyle = g;
-      ctx.fillRect(box.x - box.w * 0.15, y - 40, box.w * 1.3, 46);
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(box.x - box.w * 0.15, y); ctx.lineTo(box.x + box.w * 1.15, y); ctx.stroke();
-      ctx.restore();
-    }
-    function totalDraw() { return beamLen.reduce(function (s, l) { return s + l; }, 0) / DRAW_SPEED; }
-
-    function render(drawn, opts) {
-      var box = buildingBox();
-      computeLengths(box);
-      if (beamLen.length !== beams.length) return;
-      ctx.clearRect(0, 0, W, H);
-      var globalAlpha = opts.fade != null ? opts.fade : 1;
-      ctx.globalAlpha = 1;
-      drawGrid(box, globalAlpha);
-      ctx.globalAlpha = globalAlpha;
-
-      var acc = 0, headPos = null;
-      var litNodes = {};
-      for (var i = 0; i < beams.length; i++) {
-        var dur = beamLen[i] / DRAW_SPEED;
-        var p = P(beams[i][0], box), q = P(beams[i][1], box);
-        var t;
-        if (drawn >= acc + dur) t = 1;
-        else if (drawn <= acc) t = 0;
-        else t = (drawn - acc) / dur;
-        if (t > 0) {
-          var end = drawBeam(p, q, t);
-          litNodes[beams[i][0]] = true;
-          if (t >= 1) litNodes[beams[i][1]] = true;
-          else headPos = end;
+    function connect() {
+      var maxD = (W / 7) * (H / 7);
+      for (var a = 0; a < parts.length; a++) {
+        for (var b = a + 1; b < parts.length; b++) {
+          var dx = parts[a].x - parts[b].x, dy = parts[a].y - parts[b].y, d = dx * dx + dy * dy;
+          if (d < maxD) {
+            var op = 1 - d / 22000; if (op <= 0) continue;
+            var near = false;
+            if (mouse.x != null) { var mdx = parts[a].x - mouse.x, mdy = parts[a].y - mouse.y; near = (mdx * mdx + mdy * mdy) < mouse.r * mouse.r; }
+            ctx.strokeStyle = near ? 'rgba(' + ACCENT + ',' + (op * 0.9) + ')' : 'rgba(' + SKY + ',' + (op * 0.55) + ')';
+            ctx.lineWidth = near ? 1.4 : 0.9;
+            ctx.beginPath(); ctx.moveTo(parts[a].x, parts[a].y); ctx.lineTo(parts[b].x, parts[b].y); ctx.stroke();
+          }
         }
-        acc += dur;
       }
-      if (opts.scan != null) drawScanLine(box, opts.scan);
-      Object.keys(litNodes).forEach(function (idx) { drawNode(P(parseInt(idx, 10), box)); });
-      if (headPos) drawHead(headPos.x, headPos.y);
-      ctx.globalAlpha = 1;
     }
+    function step(move) {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        if (move) {
+          if (p.x > W || p.x < 0) p.vx = -p.vx;
+          if (p.y > H || p.y < 0) p.vy = -p.vy;
+          if (mouse.x != null) {
+            var dx = mouse.x - p.x, dy = mouse.y - p.y, dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.r + p.size && dist > 0) {
+              var f = (mouse.r - dist) / mouse.r;
+              p.x -= (dx / dist) * f * 4; p.y -= (dy / dist) * f * 4;
+            }
+          }
+          p.x += p.vx; p.y += p.vy;
+        }
+        drawNode(p);
+      }
+      connect();
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseout', onLeave);
 
     resize();
     if (reduced) {
-      render(totalDraw() + 1, { scan: null, fade: 1 });
+      step(false);
     } else {
-      var start = null;
-      (function loop(ts) {
-        if (start == null) start = ts;
-        computeLengths(buildingBox());
-        if (beamLen.length !== beams.length) { requestAnimationFrame(loop); return; }
-        var elapsed = (ts - start) / 1000;
-        var drawDur = totalDraw();
-        var cycle = drawDur + HOLD_TIME + FADE_TIME;
-        var tc = elapsed % cycle;
-        if (tc < drawDur) {
-          render(tc, { scan: tc / drawDur, fade: 1 });
-        } else if (tc < drawDur + HOLD_TIME) {
-          render(drawDur + 999, { scan: null, fade: 1 });
-        } else {
-          var f = 1 - (tc - drawDur - HOLD_TIME) / FADE_TIME;
-          render(drawDur + 999, { scan: null, fade: Math.max(0, f) });
-        }
-        requestAnimationFrame(loop);
-      })();
+      (function loop() { step(true); requestAnimationFrame(loop); })();
     }
   }
 
