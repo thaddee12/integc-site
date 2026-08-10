@@ -558,7 +558,12 @@ footer.site-footer { background: var(--ink-2); color: #c7cbe4; margin-top: auto;
 .ref-count .active-mission { color: var(--navy); font-weight: 700; }
 
 .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.ref-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); border: 1px solid rgba(255,255,255,0.75); box-shadow: 0 10px 34px -14px rgba(40,49,147,0.22); border-radius: 13px; padding: 24px; display: flex; flex-direction: column; }
+.ref-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); border: 1px solid rgba(255,255,255,0.75); box-shadow: 0 10px 34px -14px rgba(40,49,147,0.22); border-radius: 13px; padding: 24px; display: flex; flex-direction: column; scroll-margin-top: 170px; }
+.ref-card.just-linked { animation: refCardHighlight 1.8s ease; }
+@keyframes refCardHighlight {
+  0% { box-shadow: 0 0 0 3px rgba(255,240,0,0.9), 0 10px 34px -14px rgba(40,49,147,0.22); }
+  100% { box-shadow: 0 10px 34px -14px rgba(40,49,147,0.22); }
+}
 .ref-card .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .ref-card .domain-tag { display: inline-block; background: #eef1fb; color: var(--navy); font-family: 'Sora'; font-weight: 700; font-size: 11px; padding: 5px 11px; border-radius: 100px; }
 .ref-card .year-tag { font-family: 'Sora'; font-weight: 800; font-size: 14px; color: #c3c8dd; }

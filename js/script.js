@@ -248,8 +248,43 @@
     dots.forEach(function (d, i) {
       d.addEventListener('click', function () { goTo(i); restartTimer(); });
     });
+
+    var touchStartX = null, touchDeltaX = 0;
+    track.addEventListener('touchstart', function (e) {
+      touchStartX = e.touches[0].clientX;
+      touchDeltaX = 0;
+    }, { passive: true });
+    track.addEventListener('touchmove', function (e) {
+      if (touchStartX == null) return;
+      touchDeltaX = e.touches[0].clientX - touchStartX;
+    }, { passive: true });
+    track.addEventListener('touchend', function () {
+      if (touchStartX == null) return;
+      if (Math.abs(touchDeltaX) > 40) {
+        if (touchDeltaX < 0) next(); else prev();
+        restartTimer();
+      }
+      touchStartX = null; touchDeltaX = 0;
+    });
+
     renderCarousel();
     restartTimer();
+  }
+
+  /* ---------- mise en avant de la fiche projet ciblée (lien carrousel / phare-card) ---------- */
+  function highlightLinkedCard() {
+    var id = window.location.hash.replace('#', '');
+    if (!id) return;
+    var target = document.getElementById(id);
+    if (!target || !target.classList.contains('ref-card')) return;
+    target.classList.remove('just-linked');
+    void target.offsetWidth;
+    target.classList.add('just-linked');
+    setTimeout(function () { target.classList.remove('just-linked'); }, 1800);
+  }
+  if (document.querySelector('.ref-card')) {
+    window.addEventListener('hashchange', highlightLinkedCard);
+    if (window.location.hash) setTimeout(highlightLinkedCard, 50);
   }
 
   /* ---------- filtres références (client-side) ---------- */
