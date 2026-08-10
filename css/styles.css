@@ -290,22 +290,17 @@ header.site-header {
 @media (max-width: 560px) { .dom-grid { grid-template-columns: 1fr; } }
 
 /* ---------- projets phares : scroll-expand ---------- */
-.phares-scroll { position: relative; height: 210vh; }
-.phares-sticky { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-#ph-media { position: relative; overflow: hidden; border-radius: 18px; cursor: pointer; background: var(--ink-2); }
+#phares-scroll { position: relative; height: 210vh; }
+#phares-scroll .ph-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#ph-media { position: relative; max-width: 94vw; max-height: 82vh; border-radius: 20px; overflow: hidden; cursor: pointer; background: var(--ink-2); box-shadow: 0 40px 90px -34px rgba(13,17,48,.7); will-change: width, height; }
 #ph-media .ph-img { position: absolute; inset: 0; background-size: cover; background-position: center; }
-#ph-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,14,38,.85) 10%, rgba(11,14,38,.15) 55%, rgba(11,14,38,.05)); }
-#ph-caption { position: absolute; left: 5%; bottom: 8%; max-width: 560px; }
-#ph-caption .tag { display: inline-block; background: var(--accent); color: var(--ink-2); font-family: 'Sora'; font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px; }
-#ph-caption h3 { font-weight: 800; font-size: 30px; color: #fff; line-height: 1.1; text-shadow: 0 2px 12px rgba(0,0,0,.5); margin: 0; }
-#ph-caption .meta { font-size: 15px; color: #e7eaff; margin-top: 6px; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
-.phares-titles { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; gap: 24px; pointer-events: none; mix-blend-mode: difference; z-index: 5; padding: 0 20px; }
-.phares-titles h2 { font-weight: 800; font-size: 15vw; color: #fff; line-height: .9; letter-spacing: -2px; white-space: nowrap; }
-#ph-hint { position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); font-size: 13px; letter-spacing: 1px; color: #c3c8ec; z-index: 4; }
+#ph-titles { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; gap: 24px; pointer-events: none; mix-blend-mode: difference; }
+#ph-titles h2 { font-family: 'Sora'; font-weight: 800; font-size: clamp(38px, 7vw, 84px); color: #c9d2ff; margin: 0; line-height: 1; letter-spacing: -2px; will-change: transform; }
+@media (prefers-reduced-motion: reduce) { #ph-titles h2, #ph-media { transition: none; } }
 
 /* ---------- projets phares : grille ---------- */
 .phares-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
-.phare-card { border-radius: 14px; overflow: hidden; position: relative; aspect-ratio: 3/4; background: var(--ink-2); cursor: pointer; transition: transform .5s cubic-bezier(.4,0,.2,1), filter .5s ease, opacity .5s ease, box-shadow .5s ease; display: block; }
+.phare-card { border: none; font: inherit; text-align: left; padding: 0; width: 100%; -webkit-appearance: none; appearance: none; border-radius: 14px; overflow: hidden; position: relative; aspect-ratio: 3/4; background: var(--ink-2); cursor: pointer; transition: transform .5s cubic-bezier(.4,0,.2,1), filter .5s ease, opacity .5s ease, box-shadow .5s ease; display: block; }
 .phares-grid:hover .phare-card:not(:hover) { transform: scale(0.96); filter: blur(2px); opacity: 0.55; }
 .phare-card:hover { transform: scale(1.05); filter: none; opacity: 1; z-index: 2; box-shadow: 0 28px 60px -22px rgba(13,17,48,0.65); }
 .phare-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; }
@@ -316,7 +311,26 @@ header.site-header {
 .phare-card .metric { font-size: 13px; color: #c3c8ec; }
 .phare-card .go { margin-top: 14px; font-family: 'Sora'; font-weight: 700; font-size: 12.5px; color: var(--accent); display: block; }
 @media (max-width: 900px) { .phares-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 560px) { .phares-grid { grid-template-columns: 1fr; } .phares-titles h2 { font-size: 20vw; } }
+@media (max-width: 560px) { .phares-grid { grid-template-columns: 1fr; } }
+
+/* ---------- projets phares : carrousel modal ---------- */
+#ph-modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 28px; background: rgba(9,12,34,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#ph-modal.open { display: flex; }
+#ph-modal .card { position: relative; width: 100%; max-width: 1080px; max-height: 90vh; overflow: hidden; border-radius: 20px; background: #12163a; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 50px 120px -40px rgba(0,0,0,.7); display: grid; grid-template-columns: 1.15fr 1fr; }
+#ph-modal .media { position: relative; min-height: 360px; background: #0f1230; }
+#ph-modal .media .bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: .9; }
+#ph-modal .media .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,18,48,.7), rgba(15,18,48,.05)); }
+#ph-modal .cat { position: absolute; top: 20px; left: 20px; background: var(--accent); color: var(--ink-2); font-family: 'Sora'; font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 6px; }
+#ph-modal .arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer; background: rgba(18,22,58,.7); color: #fff; font-size: 20px; backdrop-filter: blur(8px); }
+#ph-modal .arrow.prev { left: 16px; }
+#ph-modal .arrow.next { right: 16px; }
+#ph-modal .body { padding: 40px 38px; display: flex; flex-direction: column; overflow-y: auto; }
+#ph-modal .body h2 { font-family: 'Sora'; font-weight: 800; font-size: 30px; line-height: 1.12; color: #fff; margin: 0 0 8px; letter-spacing: -.5px; }
+#ph-modal .figs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+#ph-modal .fig { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 11px; padding: 14px 16px; }
+#ph-modal .dots { display: flex; gap: 8px; align-items: center; }
+#ph-modal .dot { height: 9px; border-radius: 100px; border: none; cursor: pointer; padding: 0; transition: width .3s ease, background .3s ease; }
+@media (max-width: 760px) { #ph-modal .card { grid-template-columns: 1fr; } }
 
 /* ---------- actualités (cartes) ---------- */
 .news-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }

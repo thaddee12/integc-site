@@ -218,24 +218,44 @@
   </section>
 
   <!-- ===== PROJETS PHARES · SCROLL EXPAND ===== -->
-  <section id="phares-scroll" class="phares-scroll">
-    <div class="phares-sticky">
-      <div id="ph-media">
+  <section id="phares-scroll">
+    <div class="ph-sticky">
+      <div id="ph-media" data-index="0">
         <div class="ph-img" style="background-image:url('assets/phare-kribi.jpeg');"></div>
-        <div id="ph-overlay"></div>
-        <div id="ph-caption">
-          <div class="tag">Autoroutes &amp; Routes</div>
-          <h3>Autoroute Kribi–Lolabé</h3>
-          <div class="meta">40 km · Section autoroutière</div>
-        </div>
       </div>
-      <div class="phares-titles">
+      <div id="ph-titles">
         <h2 id="ph-tl">Projets</h2>
         <h2 id="ph-tr">phares</h2>
       </div>
-      <div id="ph-hint">Défilez pour explorer ↓</div>
     </div>
   </section>
+
+  <!-- ===== PROJETS PHARES · CARROUSEL MODAL ===== -->
+  <div id="ph-modal" aria-hidden="true">
+    <div class="card">
+      <div class="media">
+        <div class="bg" id="phm-bg"></div>
+        <div class="veil"></div>
+        <div class="cat" id="phm-cat"></div>
+        <button class="arrow prev" data-nav="-1" aria-label="Précédent">‹</button>
+        <button class="arrow next" data-nav="1" aria-label="Suivant">›</button>
+      </div>
+      <div class="body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+          <div style="font-family:'Sora';font-weight:800;font-size:13px;color:#8ea2e8;letter-spacing:1px;" id="phm-count"></div>
+          <button id="phm-close" aria-label="Fermer" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:#c7cbe4;font-size:18px;cursor:pointer;">✕</button>
+        </div>
+        <h2 id="phm-name"></h2>
+        <div id="phm-meta" style="font-size:14px;color:#c3c8ec;margin-bottom:20px;"></div>
+        <p id="phm-desc" style="font-size:15px;line-height:1.7;color:#c7cbe4;margin:0 0 24px;"></p>
+        <div class="figs" id="phm-figs"></div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);">
+          <div class="dots" id="phm-dots"></div>
+          <button data-nav="1" style="background:#FFF000;color:#161a3d;font-family:'Sora';font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:100px;cursor:pointer;">Projet suivant →</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== PROJETS PHARES · GRILLE ===== -->
   <section class="section" style="padding-top:20px;">
@@ -247,7 +267,7 @@
       <a href="references.html" class="btn-outline-navy">Toutes les références →</a>
     </div>
     <div class="phares-grid">
-      <a href="references.html#kribi" class="phare-card">
+      <button type="button" class="phare-card" data-phare="0">
         <img src="assets/phare-kribi.jpeg" alt="Autoroute Kribi–Lolabé" loading="lazy">
         <div class="veil"></div>
         <div class="body">
@@ -256,8 +276,8 @@
           <div class="metric">40 km · Sud</div>
           <span class="go">Voir le projet →</span>
         </div>
-      </a>
-      <a href="references.html#dgi" class="phare-card">
+      </button>
+      <button type="button" class="phare-card" data-phare="1">
         <img src="assets/phare-dgi.jpg" alt="Siège de la Direction Générale des Impôts" loading="lazy">
         <div class="veil"></div>
         <div class="body">
@@ -266,8 +286,8 @@
           <div class="metric">R+15 · Centre</div>
           <span class="go">Voir le projet →</span>
         </div>
-      </a>
-      <a href="references.html#benoue" class="phare-card">
+      </button>
+      <button type="button" class="phare-card" data-phare="2">
         <img src="assets/phare-benoue.jpg" alt="Pont sur la Bénoué" loading="lazy">
         <div class="veil"></div>
         <div class="body">
@@ -276,8 +296,8 @@
           <div class="metric">Franchissement · Nord</div>
           <span class="go">Voir le projet →</span>
         </div>
-      </a>
-      <a href="references.html#ligne" class="phare-card">
+      </button>
+      <button type="button" class="phare-card" data-phare="3">
         <img src="assets/phare-ligne.jpg" alt="Ligne 225 kV Ebolowa–Kribi" loading="lazy">
         <div class="veil"></div>
         <div class="body">
@@ -286,7 +306,7 @@
           <div class="metric">225 kV · Sud</div>
           <span class="go">Voir le projet →</span>
         </div>
-      </a>
+      </button>
     </div>
   </section>
 

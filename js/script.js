@@ -72,54 +72,122 @@
     counters.forEach(function (el) { cio.observe(el); });
   }
 
-  /* ---------- projets phares : scroll-expand media ---------- */
-  var pharesEl = document.getElementById('phares-scroll');
-  if (pharesEl) {
-    var media = document.getElementById('ph-media');
-    var overlay = document.getElementById('ph-overlay');
-    var caption = document.getElementById('ph-caption');
-    var tl = document.getElementById('ph-tl');
-    var tr = document.getElementById('ph-tr');
-    var hint = document.getElementById('ph-hint');
-    var ticking = false;
+  /* ---------- projets phares : scroll-expand + clic → carrousel modal ---------- */
+  var PHARES_FR = [
+    { cat: 'Autoroutes & Routes', name: 'Autoroute Kribi–Lolabé', client: 'MINTP', region: 'Sud', year: 2015,
+      img: 'assets/phare-kribi.jpeg',
+      desc: "Maîtrise d'œuvre d'une section autoroutière stratégique reliant le port en eau profonde de Kribi à Lolabé.",
+      figures: [['Linéaire', '40 km'], ['Client', 'MINTP'], ['Mission', "Maîtrise d'œuvre"], ['Année', '2015']] },
+    { cat: 'Bâtiments', name: 'Siège de la Direction Générale des Impôts', client: 'MINFI', region: 'Centre', year: 2017,
+      img: 'assets/phare-dgi.jpg',
+      desc: "Maîtrise d'œuvre du nouvel immeuble-siège de la Direction Générale des Impôts, inauguré à Yaoundé le 27 novembre 2020.",
+      figures: [['Envergure', 'R+15'], ['Client', 'MINFI'], ['Mission', "Maîtrise d'œuvre"], ['Année', '2017']] },
+    { cat: "Ouvrages d'art", name: 'Pont sur la Bénoué', client: 'MINTP', region: 'Nord', year: 2017,
+      img: 'assets/phare-benoue.jpg',
+      desc: "Étude de réhabilitation du pont sur la Bénoué, un ouvrage de 405,60 m à deux poutres en béton armé sur 12 travées continues de 33,80 m.",
+      figures: [['Portée totale', '405,60 m'], ['Travées', '12 × 33,80 m'], ['Largeur', '8 m'], ['Année', '2017']] },
+    { cat: 'Eau & Énergie', name: 'Ligne 225 kV Ebolowa–Kribi', client: 'SONATREL', region: 'Sud', year: 2020,
+      img: 'assets/phare-ligne.jpg',
+      desc: "Maîtrise d'œuvre de la ligne électrique 225 kV reliant Ebolowa à Kribi, pour le compte de SONATREL.",
+      figures: [['Tension', '225 kV'], ['Client', 'SONATREL'], ['Mission', "Maîtrise d'œuvre"], ['Année', '2020']] }
+  ];
+  var PHARES_EN = [
+    { cat: 'Highways & Roads', name: 'Kribi–Lolabé Highway', client: 'MINTP', region: 'South', year: 2015,
+      img: 'assets/phare-kribi.jpeg',
+      desc: 'Project management of a strategic highway section connecting the deep-water port of Kribi to Lolabé.',
+      figures: [['Length', '40 km'], ['Client', 'MINTP'], ['Mission', 'Project management'], ['Year', '2015']] },
+    { cat: 'Buildings', name: 'General Directorate of Taxation Headquarters', client: 'MINFI', region: 'Centre', year: 2017,
+      img: 'assets/phare-dgi.jpg',
+      desc: 'Project management of the new General Directorate of Taxation headquarters, inaugurated in Yaoundé on 27 November 2020.',
+      figures: [['Scale', '15 floors'], ['Client', 'MINFI'], ['Mission', 'Project management'], ['Year', '2017']] },
+    { cat: 'Structural Works', name: 'Bénoué River Bridge', client: 'MINTP', region: 'North', year: 2017,
+      img: 'assets/phare-benoue.jpg',
+      desc: 'Design review of the rehabilitated Bénoué River bridge, a 405.60 m structure with two reinforced concrete girders across 12 continuous 33.80 m spans.',
+      figures: [['Total span', '405.60 m'], ['Spans', '12 × 33.80 m'], ['Width', '8 m'], ['Year', '2017']] },
+    { cat: 'Water & Energy', name: '225 kV Ebolowa–Kribi Power Line', client: 'SONATREL', region: 'South', year: 2020,
+      img: 'assets/phare-ligne.jpg',
+      desc: 'Project management of the 225 kV power line connecting Ebolowa to Kribi, for SONATREL.',
+      figures: [['Voltage', '225 kV'], ['Client', 'SONATREL'], ['Mission', 'Project management'], ['Year', '2020']] }
+  ];
+  var pharesSec = document.getElementById('phares-scroll');
+  if (pharesSec) {
+    var PHARES = document.documentElement.lang === 'en' ? PHARES_EN : PHARES_FR;
+    var phMedia = document.getElementById('ph-media');
+    var phTl = document.getElementById('ph-tl'), phTr = document.getElementById('ph-tr');
+    var phReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var phTicking = false;
 
-    function render() {
-      ticking = false;
-      var total = pharesEl.offsetHeight - window.innerHeight;
-      var rect = pharesEl.getBoundingClientRect();
-      var p = total > 0 ? Math.min(Math.max(-rect.top / total, 0), 1) : 0;
-
-      var minW = Math.min(window.innerWidth * 0.86, 560);
-      var maxW = window.innerWidth;
-      var minH = Math.min(window.innerHeight * 0.56, 460);
-      var maxH = window.innerHeight;
-      var w = minW + (maxW - minW) * p;
-      var h = minH + (maxH - minH) * p;
-      var radius = 18 * (1 - p);
-
-      if (media) {
-        media.style.width = w + 'px';
-        media.style.height = h + 'px';
-        media.style.borderRadius = radius + 'px';
-      }
-      if (overlay) overlay.style.opacity = String(0.35 + p * 0.5);
-      if (caption) {
-        caption.style.opacity = String(p);
-        caption.style.transform = 'translateY(' + (14 - p * 14) + 'px)';
-      }
-      if (tl) tl.style.transform = 'translateX(' + (-p * 40) + 'px)';
-      if (tr) tr.style.transform = 'translateX(' + (p * 40) + 'px)';
-      var titleOpacity = 1 - Math.min(p / 0.5, 1);
-      if (tl) tl.style.opacity = String(titleOpacity);
-      if (tr) tr.style.opacity = String(titleOpacity);
-      if (hint) hint.style.opacity = String(1 - Math.min(p / 0.2, 1));
+    function phOnScroll() {
+      if (phTicking) return;
+      phTicking = true;
+      requestAnimationFrame(function () {
+        var total = pharesSec.offsetHeight - window.innerHeight;
+        var p = total > 0 ? Math.min(1, Math.max(0, -pharesSec.getBoundingClientRect().top / total)) : 0;
+        var eas = 1 - Math.pow(1 - p, 2);
+        if (phMedia) {
+          phMedia.style.width = Math.round(360 + eas * 1240) + 'px';
+          phMedia.style.height = Math.round(230 + eas * 560) + 'px';
+          phMedia.style.borderRadius = Math.round(20 - eas * 8) + 'px';
+        }
+        var tX = eas * 26;
+        if (phTl) phTl.style.transform = 'translateX(-' + tX + 'vw)';
+        if (phTr) phTr.style.transform = 'translateX(' + tX + 'vw)';
+        phTicking = false;
+      });
     }
-    function onScroll() {
-      if (!ticking) { requestAnimationFrame(render); ticking = true; }
+    if (!phReduced) {
+      window.addEventListener('scroll', phOnScroll, { passive: true });
+      window.addEventListener('resize', phOnScroll);
+      phOnScroll();
+    } else if (phMedia) {
+      phMedia.style.width = '1200px';
+      phMedia.style.height = '560px';
     }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    render();
+
+    /* ---- carrousel modal ---- */
+    var phModal = document.getElementById('ph-modal');
+    var phIdx = 0;
+    function phEl(id) { return document.getElementById(id); }
+    function phRender() {
+      var d = PHARES[phIdx];
+      phEl('phm-bg').style.backgroundImage = "url('" + d.img + "')";
+      phEl('phm-cat').textContent = d.cat;
+      phEl('phm-count').textContent = (document.documentElement.lang === 'en' ? 'PROJECT ' : 'PROJET ') + (phIdx + 1) + ' / ' + PHARES.length;
+      phEl('phm-name').textContent = d.name;
+      phEl('phm-meta').textContent = d.client + ' · ' + d.region + ' · ' + d.year;
+      phEl('phm-desc').textContent = d.desc;
+      phEl('phm-figs').innerHTML = d.figures.map(function (f) {
+        return '<div class="fig"><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:#8ea2e8;text-transform:uppercase;">' + f[0] + '</div><div style="font-family:\'Sora\';font-weight:700;font-size:16px;color:#fff;margin-top:4px;">' + f[1] + '</div></div>';
+      }).join('');
+      phEl('phm-dots').innerHTML = PHARES.map(function (_, k) {
+        return '<button class="dot" data-go="' + k + '" style="width:' + (k === phIdx ? 26 : 9) + 'px;background:' + (k === phIdx ? '#FFF000' : 'rgba(255,255,255,.4)') + ';"></button>';
+      }).join('');
+    }
+    function phOpen(i) { phIdx = i; phRender(); if (phModal) { phModal.classList.add('open'); phModal.setAttribute('aria-hidden', 'false'); } }
+    function phClose() { if (phModal) { phModal.classList.remove('open'); phModal.setAttribute('aria-hidden', 'true'); } }
+    function phNav(delta) { phIdx = (phIdx + delta + PHARES.length) % PHARES.length; phRender(); }
+
+    if (phMedia) phMedia.addEventListener('click', function () { phOpen(0); });
+    var phCloseBtn = phEl('phm-close');
+    if (phCloseBtn) phCloseBtn.addEventListener('click', phClose);
+    if (phModal) {
+      phModal.addEventListener('click', function (e) {
+        if (e.target === phModal) { phClose(); return; }
+        var navBtn = e.target.closest('[data-nav]');
+        if (navBtn) phNav(parseInt(navBtn.getAttribute('data-nav'), 10));
+        var goBtn = e.target.closest('[data-go]');
+        if (goBtn) { phIdx = parseInt(goBtn.getAttribute('data-go'), 10); phRender(); }
+      });
+    }
+    window.addEventListener('keydown', function (e) {
+      if (!phModal || !phModal.classList.contains('open')) return;
+      if (e.key === 'Escape') phClose();
+      if (e.key === 'ArrowRight') phNav(1);
+      if (e.key === 'ArrowLeft') phNav(-1);
+    });
+    Array.prototype.slice.call(document.querySelectorAll('[data-phare]')).forEach(function (el) {
+      el.addEventListener('click', function () { phOpen(parseInt(el.getAttribute('data-phare'), 10)); });
+    });
   }
 
   /* ---------- hero réseau de particules (canvas plein cadre, interactif souris) ---------- */
